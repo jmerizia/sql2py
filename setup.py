@@ -25,8 +25,11 @@ setuptools.setup(
         'fire==0.4.0'
     ],
     test_suite='tests',
-    package_dir={"": "src"},
-    packages=setuptools.find_packages(where="src"),
+    package_dir={"": "."},
+    packages=setuptools.find_packages(where="."),
+    package_data = {
+        'sqlgood': ['py.typed']
+    },
     python_requires=">=3.6",
 )
 

@@ -85,7 +85,7 @@ def equal_tokens(a: List[str], b: List[str]) -> bool:
     return True
 
 
-def consume_token(tokens: str, idx: int) -> Tuple[Optional[str], int]:
+def consume_token(tokens: List[str], idx: int) -> Tuple[Optional[str], int]:
     if idx == len(tokens):
         return None, idx
     else:
@@ -148,13 +148,13 @@ def parse_schema(schema_text: str) -> ParsedSchema:
 
     tables_text = [s.strip() for s in schema_text.strip().split(';')]
     tables_text = [s for s in tables_text if len(s) > 0]
-    tables = []
+    tables: List[ParsedTable] = []
     for text in tables_text:
         table_name = text.split(' ')[2].strip()
         table_fields_text = ' '.join(text.split(' ')[3:])[1:-1].split(',')
         table_fields_text = [s.strip() for s in table_fields_text]
         table_fields_text = [s for s in table_fields_text if len(s) > 0]
-        fields = []
+        fields: List[ParsedField] = []
         for text in table_fields_text:
             tokens = text.split(' ')
             name = tokens[0]
@@ -164,13 +164,13 @@ def parse_schema(schema_text: str) -> ParsedSchema:
                 'name': name,
                 'type': schema_type2type_hint(type),
             })
-        tables.append({'table_name': table_name, 'fields': fields})
+        tables.append({'name': table_name, 'fields': fields})
     return tables
 
 
-def get_columns_for_table(schema_text: str, table_name: str) -> List[dict]:
+def get_columns_for_table(schema_text: str, table_name: str) -> List[ParsedField]:
     tables = parse_schema(schema_text)
-    res = [table for table in tables if table['table_name'] == table_name]
+    res = [table for table in tables if table['name'] == table_name]
     if len(res) != 1:
         raise ValueError(f'Invalid table name {table_name}')
     return res[0]['fields']
@@ -254,8 +254,8 @@ def parse_query_types(query_text: str, schema_text: str) -> ParsedQueryTypes:
         # Now, parse inputs (VERY rudimentary)
         num_inputs = query_text.count('?')
         # TODO: we should probably at least get the names of the inputs...
-        input_types = [{'name': f'in{i}', 'type': 'str'} for i in range(1, num_inputs+1)]
-        return input_types, chosen_columns
+        input_types: List[ParsedField] = [{'name': f'in{i}', 'type': 'str'} for i in range(1, num_inputs+1)]
+        return ParsedQueryTypes(inputs=input_types, outputs=chosen_columns)
 
     elif tok.upper() == 'INSERT':
         tok, idx = consume_token(tokens, idx)
@@ -322,8 +322,8 @@ def parse_query_types(query_text: str, schema_text: str) -> ParsedQueryTypes:
                 input_types.append(res[0])
             else:
                 pass
-        output_types = []
-        return input_types, output_types
+        output_types: List[ParsedField] = []
+        return ParsedQueryTypes(inputs=input_types, outputs=output_types)
 
     else:
         raise ValueError(f'Invalid query: {query_text}\n  Invalid token \'{tok}\' at beginning of SQL query')

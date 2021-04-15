@@ -1,15 +1,17 @@
-from typing import TypedDict
-from sqlgood import connect_sqlite
-from typing import List
+from typing import List, TypedDict
+from sqlgood import sqlite
 
 
-db = connect_sqlite('example.db')
+db = sqlite.connect('example.db')
 
 class User(TypedDict):
     id: int
-    name: str
+    email: str
+    age: str
 
-with db.transaction() as t:
-    users: List[User] = t.query('SELECT id, nickname FROM users;')
-    t.query('INSERT INTO users (nickname) VALUES (?)', ('Jake',))
+things = db.query('SELECT id, email, age FROM users;')
+
+#with db.transaction() as t:
+#    users: None = t.query('SELECT id, nickname FROM users;')
+#    t.query('INSERT INTO users (nickname) VALUES (?)', ('Jake',))
 

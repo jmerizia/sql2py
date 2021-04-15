@@ -1,7 +1,8 @@
 __pycache__/
 build/
 dist/
-src/*.egg-info
+*.egg-info
 *.pyo
 *.pyc
 .mypy_cache/
+.vscode/
