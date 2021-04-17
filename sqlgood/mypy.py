@@ -2,11 +2,11 @@ import os
 from configparser import ConfigParser
 from functools import partial
 from mypy.plugin import Plugin, MethodSigContext, CheckerPluginInterface
-from mypy.types import CallableType, Type, TypedDictType, Instance, TupleType
-from mypy.nodes import TypeInfo, SymbolTable, ClassDef, Block
+from mypy.types import CallableType, Type, TypedDictType, Instance, TupleType, AnyType
+from mypy.nodes import TypeInfo, SymbolTable, ClassDef, Block, StrExpr
 from mypy.mro import calculate_mro
 from mypy.options import Options
-from typing import Any, List, Tuple, Optional, Dict, Set
+from typing import Any, List, Tuple, Optional, Dict, Set, TypedDict
 
 from sqlgood.parse_sqlite import get_db_schema_text
 from sqlgood.parse_sqlite import parse_query_types
@@ -23,7 +23,7 @@ def _sql_outputs_to_return_typed_dict(outputs: List[ParsedField], api: CheckerPl
     str_type = api.named_generic_type('builtins.str', [])
     bool_type = api.named_generic_type('builtins.bool', [])
     dict_type = api.named_generic_type('builtins.dict', [])
-    items: Dict[str, Instance] = dict()
+    items: Dict[str, Type] = dict()
     required_keys: Set[str] = set()
     for field in outputs:
         name = field['name']
@@ -35,10 +35,13 @@ def _sql_outputs_to_return_typed_dict(outputs: List[ParsedField], api: CheckerPl
         elif typ == 'bool':
             instance = Instance(bool_type.type, [])
         else:
-            raise ValueError(f'Invalid type {typ}')
+            raise ValueError(f'Internal Error: unhandled type {typ}')
         items[name] = instance
         required_keys.add(name)
-    return TypedDictType(items, required_keys, dict_type)
+    fallback = api.named_type('builtins.dict', [])
+    thing = TypedDictType(items, required_keys, fallback)
+    print(thing.fallback.type)
+    return thing
 
 
 def _sql_inputs_to_arg_tuple(inputs: List[ParsedField], api: CheckerPluginInterface) -> TupleType:
@@ -53,7 +56,9 @@ def sqlite_hook(schema_text: Optional[str], ctx: MethodSigContext) -> Type:
             f'with a field \'sqlite_database_filename=...\'',
             ctx.context)
         return ctx.default_signature
-    sql = ctx.args[0][0].value
+    string_expression = ctx.args[0][0]
+    assert isinstance(string_expression, StrExpr)
+    sql = string_expression.value
     try:
         schema = parse_schema(schema_text)
     except ValueError as e:
@@ -66,12 +71,14 @@ def sqlite_hook(schema_text: Optional[str], ctx: MethodSigContext) -> Type:
         ctx.api.fail('Failed to parse SQL query: ' + str(e), ctx.context)
         return ctx.default_signature
 
-    new_ret_type = ctx.api.named_generic_type(
+    #new_ret_type = _sql_outputs_to_return_typed_dict(outputs, ctx.api)
+    new_ret_type = ctx.api.named_generic_type(  #'builtins.list', [AnyType(0)])
         'builtins.list',
         [
             _sql_outputs_to_return_typed_dict(outputs, ctx.api)
         ]
     )
+    print(new_ret_type)
     return CallableType(
         arg_types=ctx.default_signature.arg_types,
         arg_kinds=ctx.default_signature.arg_kinds,

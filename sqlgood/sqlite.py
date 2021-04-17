@@ -11,8 +11,6 @@ from sqlgood.parse_sqlite import ParsedSchema
 from sqlgood.parse_sqlite import ParsedQueryTypes
 
 
-#TempSQLiteResponseValue = Any
-
 @lru_cache(maxsize=None)
 def parse_query_types_cached(query_text: str, schema_text: str) -> ParsedQueryTypes:
     return parse_query_types(query_text, schema_text)
