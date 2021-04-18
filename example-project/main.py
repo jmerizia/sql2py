@@ -1,28 +1,24 @@
 from typing import List, TypedDict
-from sqlgood import sqlite
 
 import queries
 
-
-db = sqlite.connect('example.db')
-
+# Although this type class is not necessary,
+# it helps to have these types here anyways.
+# If this type class is ever wrong, mypy will
+# rightfully complain.
 class User(TypedDict):
     id: int
     email: str
+    nickname: str
     age: int
+    is_admin: bool
 
-users = db.query('SELECT id, email, age FROM users;')
+existing = queries.get_a_user_by_email(in1='a@example.com')
+if len(existing) == 0:
+    queries.create_a_new_user(email='a@example.com', age=25, nickname='a', is_admin=False)
 
-print(users[0])
+users: List[User] = queries.select_all_users()
+print([user['id'] for user in users])
 
-#print(f'There are {len(users)} users in the database:')
-#for user in users:
-#    print('  ', user['id'], user['email'], user['age'])
-#
-#res = db.query('INSERT INTO users (email, age) VALUES (?, ?)', ('Jake', 10))
-
-
-#with db.transaction() as t:
-#    users: None = t.query('SELECT id, nickname FROM users;')
-#    t.query('INSERT INTO users (nickname) VALUES (?)', ('Jake',))
-
+new_user = queries.get_a_user_by_email(in1='a@example.com')[0]
+print(new_user['nickname'])

@@ -16,6 +16,11 @@ setuptools.setup(
     project_urls={
         "Bug Tracker": "https://github.com/jmerizia/sqlgood/issues",
     },
+    entry_points = {
+        'console_scripts': [
+            'sqlgood=sqlgood.generate:main'
+        ]
+    },
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
