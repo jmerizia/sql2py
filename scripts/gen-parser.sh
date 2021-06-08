@@ -1,0 +1,1 @@
+antlr -Dlanguage=Python3 -o ./parsers Postgresql.g4
