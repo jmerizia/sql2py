@@ -1,7 +1,7 @@
-SELECT * FROM users WHERE id != 0 and age > 30;
+SELECT * FROM users WHERE age > 30;
 
 seLect id, email , age from users
-where email == 1;;
+where email == ?;;
 
 create table if not exists users (
     id INTEGER not null,
@@ -15,3 +15,6 @@ insert into users( email , nickname, age, is_admin )
 values (?, ?, ?, false) returning id;
 
 delete FROM users where email = ?;
+
+update users
+Set email = 'admin@admin.fdsa' where id = 1;

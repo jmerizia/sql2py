@@ -71,6 +71,15 @@ class PostgresqlListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by PostgresqlParser#update_query.
+    def enterUpdate_query(self, ctx:PostgresqlParser.Update_queryContext):
+        pass
+
+    # Exit a parse tree produced by PostgresqlParser#update_query.
+    def exitUpdate_query(self, ctx:PostgresqlParser.Update_queryContext):
+        pass
+
+
     # Enter a parse tree produced by PostgresqlParser#empty_query.
     def enterEmpty_query(self, ctx:PostgresqlParser.Empty_queryContext):
         pass
@@ -143,12 +152,12 @@ class PostgresqlListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgresqlParser#expr.
-    def enterExpr(self, ctx:PostgresqlParser.ExprContext):
+    # Enter a parse tree produced by PostgresqlParser#simple_expr.
+    def enterSimple_expr(self, ctx:PostgresqlParser.Simple_exprContext):
         pass
 
-    # Exit a parse tree produced by PostgresqlParser#expr.
-    def exitExpr(self, ctx:PostgresqlParser.ExprContext):
+    # Exit a parse tree produced by PostgresqlParser#simple_expr.
+    def exitSimple_expr(self, ctx:PostgresqlParser.Simple_exprContext):
         pass
 
 
@@ -161,12 +170,12 @@ class PostgresqlListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PostgresqlParser#eq.
-    def enterEq(self, ctx:PostgresqlParser.EqContext):
+    # Enter a parse tree produced by PostgresqlParser#is_eq.
+    def enterIs_eq(self, ctx:PostgresqlParser.Is_eqContext):
         pass
 
-    # Exit a parse tree produced by PostgresqlParser#eq.
-    def exitEq(self, ctx:PostgresqlParser.EqContext):
+    # Exit a parse tree produced by PostgresqlParser#is_eq.
+    def exitIs_eq(self, ctx:PostgresqlParser.Is_eqContext):
         pass
 
 
@@ -176,6 +185,24 @@ class PostgresqlListener(ParseTreeListener):
 
     # Exit a parse tree produced by PostgresqlParser#neq.
     def exitNeq(self, ctx:PostgresqlParser.NeqContext):
+        pass
+
+
+    # Enter a parse tree produced by PostgresqlParser#gt.
+    def enterGt(self, ctx:PostgresqlParser.GtContext):
+        pass
+
+    # Exit a parse tree produced by PostgresqlParser#gt.
+    def exitGt(self, ctx:PostgresqlParser.GtContext):
+        pass
+
+
+    # Enter a parse tree produced by PostgresqlParser#lt.
+    def enterLt(self, ctx:PostgresqlParser.LtContext):
+        pass
+
+    # Exit a parse tree produced by PostgresqlParser#lt.
+    def exitLt(self, ctx:PostgresqlParser.LtContext):
         pass
 
 

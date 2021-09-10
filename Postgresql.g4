@@ -11,6 +11,7 @@ query
     |  select_query
     |  insert_query
     |  delete_query
+    |  update_query
     |  empty_query
     ;
 
@@ -23,7 +24,7 @@ drop_query
     ;
 
 select_query
-    :  K_SELECT column_refs K_FROM table_ref ( K_WHERE expr )?
+    :  K_SELECT column_refs K_FROM table_ref ( K_WHERE simple_expr )?
     ;
 
 insert_query
@@ -31,7 +32,11 @@ insert_query
     ;
 
 delete_query
-    :  K_DELETE K_FROM table_ref
+    :  K_DELETE K_FROM table_ref ( K_WHERE simple_expr )?
+    ;
+
+update_query
+    :  K_UPDATE table_ref K_SET column_ref '=' atom ( ',' column_ref '=' atom )* ( K_WHERE simple_expr )?
     ;
 
 empty_query : ;
@@ -65,20 +70,18 @@ column_type
     :  ( K_INTEGER | K_TEXT | K_BOOLEAN | K_SERIAL ) ( K_NOT K_NULL )? ( K_PRIMARY K_KEY )?
     ;
 
-// I don't care for operator precedence at the moment
-expr
-    :  expr ('+'|'-'|'*'|'/'|'='|eq|neq|'and'|'or'|'>'|'<') expr
-    |  K_NOT expr
-    |  '(' expr ')'
-    |  atom
-    ;
+// simple non-recursive binary operator expression
+simple_expr
+    :  atom ( is_eq | gt | lt | K_AND | K_OR | neq ) atom
+    ;  
 
 atom
     :  INT
     |  ID
     |  K_FALSE
     |  K_TRUE
-    |  '?'
+    |  qm
+    |  STRING
     ;
 
 WS :  [ \t\n\r]+ -> skip ;
@@ -105,11 +108,23 @@ K_INTO : I N T O ;
 K_VALUES : V A L U E S ;
 K_TRUE : T R U E ;
 K_FALSE : F A L S E ;
+K_UPDATE : U P D A T E ;
+K_AND : A N D ;
+K_OR : O R ;
+K_SET : S E T ;
 ID :  [a-zA-Z_]+ ;
 INT :  [0-9]+ ;
 NEWLINE : '\r'? '\n' ;
-eq : '==' ;
+is_eq : '==' | '=' ;
 neq : '!=' ;
+gt : '>' ;
+lt : '<' ;
+qm : '?' ;
+STRING
+    :  '\'' (~'\'')* '\''
+    |  '"' (~'"')* '"'
+    ;
+
 
 fragment A : [aA];
 fragment B : [bB];

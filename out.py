@@ -19,7 +19,7 @@ class users_id_email_nickname_age_is_admin_0:
 
 def select_all_from_users_where_age_gt_30() -> List[users_id_email_nickname_age_is_admin_0]:
     '''
-    SELECT * FROM users WHERE age > 30;
+    SELECT * FROM users WHERE age > 30
     '''
 
     cur = con.cursor()
@@ -35,17 +35,17 @@ class users_id_email_age_1:
     email: str
     age: Optional[int]
 
-def select_id_email_age_from_users_where_email_eq_admin_at_admin_dot_asdf(email: str) -> List[users_id_email_age_1]:
+def select_id_email_age_from_users_where_email_eq_admin_at_admin_dot_asdf() -> List[users_id_email_age_1]:
     '''
     seLect id, email , age from users
-    where email == ?
+    where email == 'admin@admin.asdf'
     '''
 
     cur = con.cursor()
     cur.execute('''
 seLect id, email , age from users
-where email == ?
-    ''', [email])
+where email == 'admin@admin.asdf'
+    ''', [])
     return [users_id_email_age_1(id=id, email=email, age=age) for id, email, age in cur.fetchall()]
 
 
@@ -78,36 +78,6 @@ def drop_table_users() -> None:
     cur.execute('''
 drop table users
     ''', [])
-    return None
-
-
-@dataclass
-class users_id_4:
-    id: int
-
-def insert_into_users_email_nickname_age_is_admin_values_qm_qm_qm_false_returning_id(email: str, nickname: str, age: int) -> users_id_4:
-    '''
-    insert into users( email , nickname, age, is_admin )
-    values (?, ?, ?, false) returning id
-    '''
-
-    cur = con.cursor()
-    cur.execute('''
-insert into users( email , nickname, age, is_admin )
-values (?, ?, ?, false) returning id
-    ''', [email, nickname, age])
-    return users_id_4(id=cur.fetchone()[0])
-
-
-def delete_from_users_where_email_eq_qm(email: str) -> None:
-    '''
-    delete FROM users where email = ?;
-    '''
-
-    cur = con.cursor()
-    cur.execute('''
-delete FROM users where email = ?
-    ''', [email])
     return None
 
 

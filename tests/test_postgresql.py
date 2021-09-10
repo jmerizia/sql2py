@@ -20,21 +20,21 @@ def test_code_equal(expected: str, actual: str):
         for col_idx, (c_a, c_b) in enumerate(zip(line_a, line_b)):
             if c_a != c_b:
                 raise ValueError(
-                    f'Code does not match (line {line_idx}, col {col_idx}):\n' +
+                    f'Code does not match (line {line_idx+1}, col {col_idx+1}):\n' +
                     f'  {line_b}\n' +
                     f'  ' + (f' ' * col_idx) + '^\n'
                 )
         if len(line_a) > len(line_b):
             l = len(line_b)
             raise ValueError(
-                f'Unexpected end of line (line {line_idx}, col {l}):\n' +
+                f'Unexpected end of line (line {line_idx+1}, col {l}):\n' +
                 f'  {line_b}\n' +
                 f'  ' + (f' ' * l) + '^\n'
             )
         if len(line_a) < len(line_b):
             l = len(line_a)
             raise ValueError(
-                f'Expected end of line (line {line_idx}, col {l}):\n' +
+                f'Expected end of line (line {line_idx+1}, col {l}):\n' +
                 f'  {line_b}\n' +
                 f'  ' + (f' ' * l) + '^\n'
             )
@@ -60,12 +60,16 @@ class TestPostgresql(unittest.TestCase):
         self.cur = self.con.cursor()
         self.cur.execute('''
             CREATE TABLE users (
-                id INTEGER PRIMARY KEY,
-                email TEXT,
+                id SERIAL PRIMARY KEY,
+                email TEXT not null,
                 nickname TEXT,
                 age INTEGER,
                 is_admin BOOLEAN
             );
+        ''')
+        self.cur.execute('''
+            INSERT INTO users (email, nickname, age, is_admin)
+            VALUES ('admin@admin', 'admin', 42, TRUE);
         ''')
 
     def tearDown(self):
@@ -85,6 +89,8 @@ class TestPostgresql(unittest.TestCase):
         with open('tests/queries.py', 'r') as f:
             queries_py = f.read()
         generated_py = generate(queries_sql, dbname=dbname_test, user=user, password=password)
+        with open('out.py', 'w') as f:
+            f.write(generated_py)
         test_code_equal(queries_py, generated_py)
 
 
